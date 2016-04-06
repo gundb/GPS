@@ -95,9 +95,17 @@
           where.map.on('zoomlevelschange', where.opt.zoom.ing, where.opt.err);
 
           where.update = function(latlng){
+            if(new Date().getTime() - where.update.last < 1000){
+              clearTimeout(where.update.to);
+              where.update.to = setTimeout(function(){
+                where.update(latlng);
+              });
+              return;
+            }
             where.map.setView(latlng, where.opt.zoom.level, {animate: true});
             where.marker = where.marker || L.marker().setLatLng(latlng).addTo(where.map);
             where.marker.setLatLng(latlng).update();
+            where.update.last = new Date().getTime();
           }
 
           if(where.opt.track){
